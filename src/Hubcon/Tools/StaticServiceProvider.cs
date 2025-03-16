@@ -1,0 +1,40 @@
+﻿using Microsoft.AspNetCore.Builder;
+
+namespace Hubcon.Tools
+{
+    internal static class StaticServiceProvider
+    {
+        // Propiedad estática que accede al WebApplication configurado
+        internal static WebApplication App
+        {
+            get
+            {
+                // Se asegura de que el _app ha sido inicializado antes de su uso
+                if (_app == null)
+                {
+                    throw new InvalidOperationException($"Use {nameof(DependencyInjection.UseHubcon)}() method after App.Build().");
+                }
+                return _app;
+            }
+            private set => _app = value;
+        }
+
+        private static WebApplication? _app;
+
+        // Configura el WebApplication
+        internal static void Setup(WebApplication app) => _app = app;
+
+        // Accede a los servicios del contenedor
+        internal static IServiceProvider Services
+        {
+            get
+            {
+                if (_app == null)
+                {
+                    throw new InvalidOperationException($"Use {nameof(DependencyInjection.UseHubcon)}() method after App.Build().");
+                }
+                return App.Services;
+            }
+        }
+    }
+}
