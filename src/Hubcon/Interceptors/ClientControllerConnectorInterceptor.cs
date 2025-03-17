@@ -4,15 +4,15 @@ using Hubcon.Interfaces.Communication;
 using Hubcon.Models;
 using System.ComponentModel;
 
-namespace Hubcon.Core.Interceptors
+namespace Hubcon
 {
     [EditorBrowsable(EditorBrowsableState.Never)]
-    internal class ClientControllerConnectorInterceptor : AsyncInterceptorBase
+    public class ClientControllerConnectorInterceptor : AsyncInterceptorBase
     {
         private protected Func<ICommunicationHandler> HandlerFactory { get; private set; }
 
         public ClientControllerConnectorInterceptor(ICommunicationHandler handler) => HandlerFactory = () => handler;
-        
+
         protected override async Task<TResult> InterceptAsync<TResult>(IInvocation invocation, IInvocationProceedInfo proceedInfo, Func<IInvocation, IInvocationProceedInfo, Task<TResult>> proceed)
         {
             MethodResponse response = await HandlerFactory

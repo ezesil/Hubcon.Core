@@ -1,6 +1,9 @@
-﻿namespace Hubcon.SignalR.Models
+﻿using Hubcon.Interfaces;
+using Hubcon.Interfaces.Communication;
+
+namespace Hubcon.SignalR.Models
 {
-    public class ClientReference
+    public class ClientReference : IClientReference
     {
         public string Id { get; }
         public object? ClientInfo { get; set; }
@@ -16,16 +19,17 @@
             ClientInfo = clientInfo;
         }   
     }
-    public class ClientReference<TIClientController> : ClientReference
+    public class ClientReference<TICommunicationContract> : ClientReference, IClientReference<TICommunicationContract> 
+        where TICommunicationContract : ICommunicationContract
     {
-        public TIClientController ClientController { get; init; }
+        public TICommunicationContract ClientController { get; init; }
 
-        public ClientReference(string id, TIClientController clientController) : base(id)
+        public ClientReference(string id, TICommunicationContract clientController) : base(id)
         {
             ClientController = clientController;
         }
 
-        public ClientReference(string id, object? clientInfo, TIClientController clientController) : base(id, clientInfo)
+        public ClientReference(string id, object? clientInfo, TICommunicationContract clientController) : base(id, clientInfo)
         {
             ClientController = clientController;
         }

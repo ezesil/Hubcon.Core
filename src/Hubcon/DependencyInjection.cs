@@ -1,5 +1,7 @@
-﻿using Hubcon.Interfaces;
+﻿using Hubcon.Connectors;
+using Hubcon.Interfaces;
 using Hubcon.Interfaces.Communication;
+using Hubcon.Models.Interfaces;
 using Hubcon.Tools;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,6 +16,17 @@ namespace Hubcon
             return e;
         }
 
+        /// <summary>
+        /// Agrega un servicio IClientAccessor como servicio scoped que permite acceder a los clientes de un hub usando la interfaz IClientAccessor<THub, TIClientController>.
+        /// </summary>
+        /// <param name="services"></param>
+        /// <returns></returns>
+        public static IServiceCollection AddHubconClientAccessor(this IServiceCollection services)
+        {
+            services.AddScoped(typeof(IClientAccessor<,>), typeof(HubconClientConnector<,>));
+            return services;
+        }
+
         public static IServiceCollection AddHubconController<T>(this IServiceCollection services)
             where T : class, IHubconController, ICommunicationContract
         {
@@ -24,12 +37,11 @@ namespace Hubcon
                 .ToList();
 
             if (implementationTypes.Count == 0)
-                throw new InvalidOperationException($"Controller {controllerType.Name} does not implement any communication contracts.");
+                throw new InvalidOperationException($"Controller {controllerType.Name} does not implement ICommunicationContract.");
+
             
-            foreach (Type implementationType in implementationTypes)
-            {
-                services.AddScoped(controllerType, implementationType);
-            }
+            services.AddScoped<T>();
+            
 
             return services;
         }

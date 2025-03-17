@@ -1,11 +1,11 @@
 ﻿using System.Reflection;
 using System.Reflection.Emit;
 
-namespace Hubcon.Core.Interceptors
+namespace Hubcon.Interceptors
 {
     internal static class DynamicImplementationCreator
     {
-        private readonly static Dictionary<Type, Type> BuiltTypes = [];
+        private readonly static Dictionary<Type, Type> BuiltTypes = new();
 
         internal static object CreateImplementation(Type interfaceType)
         {

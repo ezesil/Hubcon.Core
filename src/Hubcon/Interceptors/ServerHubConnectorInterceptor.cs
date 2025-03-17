@@ -4,7 +4,7 @@ using Hubcon.Interfaces.Communication;
 using Hubcon.Models;
 
 
-namespace Hubcon.Core.Interceptors
+namespace Hubcon.Interceptors
 {
     internal class ServerConnectorInterceptor : AsyncInterceptorBase
     {

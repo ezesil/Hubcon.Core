@@ -1,23 +1,27 @@
-﻿using Castle.DynamicProxy;
+﻿using Hubcon.Interfaces;
 using Hubcon.Interfaces.Communication;
 using Hubcon.Models;
+using Hubcon.SignalR.Server;
 using Microsoft.AspNetCore.SignalR;
 
 namespace Hubcon.SignalR.Handlers
 {
-    public class SignalrCommunicationHandler : ICommunicationHandler
+    public class SignalRServerCommunicationHandler : ICommunicationHandler
     {
         private protected string TargetClientId { get; private set; } = string.Empty;
-        private protected Func<IHubContext<Hub>>? HubContextFactory { get; private set; }
-        private protected Func<Hub>? HubFactory { get; private set; }
+        private protected Func<IHubContext<BaseHubController>>? HubContextFactory { get; private set; }
+        private protected Func<BaseHubController>? HubFactory { get; private set; }
+        private protected Type HubType { get; private set; }
 
-        public SignalrCommunicationHandler(IHubContext<Hub> hubContextFactory)
+        public SignalRServerCommunicationHandler(IHubContext<BaseHubController> hubContextFactory, Type hubType)
         {
+            HubType = hubType;
             HubContextFactory = () => hubContextFactory;
         }
 
-        public SignalrCommunicationHandler(Hub hubFactory)
+        public SignalRServerCommunicationHandler(BaseHubController hubFactory, Type hubType)
         {
+            HubType = hubType;
             HubFactory = () => hubFactory;
         }
 
@@ -43,6 +47,17 @@ namespace Hubcon.SignalR.Handlers
 
             MethodInvokeRequest request = new MethodInvokeRequest(method, arguments).SerializeArgs();
             await client.SendAsync(method, request, cancellationToken);
+        }
+
+        public List<IClientReference> GetAllClients()
+        {
+            return BaseHubController.GetClients(HubType).ToList();
+        }
+
+        public ICommunicationHandler WithUserId(string id)
+        {
+            TargetClientId = id;
+            return this;
         }
     }
 }

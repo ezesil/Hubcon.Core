@@ -11,6 +11,8 @@ namespace Hubcon.Interfaces.Communication
     {
         public Task<MethodResponse> InvokeAsync(string method, object[] arguments, CancellationToken cancellationToken);
         public Task CallAsync(string method, object[] arguments, CancellationToken cancellationToken);
+        public List<IClientReference> GetAllClients();
+        public ICommunicationHandler WithUserId(string id);
     }
 
     public interface IAsyncCommunicationHandler : ICommunicationHandler

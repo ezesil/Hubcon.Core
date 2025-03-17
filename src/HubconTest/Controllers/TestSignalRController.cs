@@ -1,10 +1,9 @@
-﻿using Hubcon.Interfaces.Communication;
-using Hubcon.SignalR;
-using Hubcon.SignalR.Interfaces;
+﻿using Hubcon.SignalR.Models.Interfaces;
+using Hubcon.SignalR.Server;
 
 namespace HubconTest.Controllers
 {
-    public class TestSignalRController : BaseSignalRHubController, ISignalRContract
+    public class TestSignalRController : BaseHubController, ISignalRServerContract
     {
         public Task PrintMessage(string message)
         {

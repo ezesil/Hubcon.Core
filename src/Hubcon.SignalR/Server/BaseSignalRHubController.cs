@@ -1,5 +1,4 @@
-﻿using Hubcon;
-using Hubcon.Handlers;
+﻿using Hubcon.Handlers;
 using Hubcon.Interfaces;
 using Hubcon.Interfaces.Communication;
 using Hubcon.Models;
@@ -8,9 +7,9 @@ using Hubcon.SignalR.Models;
 using Hubcon.Tools;
 using Microsoft.AspNetCore.SignalR;
 
-namespace Hubcon.SignalR
+namespace Hubcon.SignalR.Server
 {
-    public abstract class BaseSignalRHubController : Hub, IHubconController<SignalrCommunicationHandler>
+    public abstract class BaseHubController : Hub, IHubconController<SignalRServerCommunicationHandler>
     {
         // Events
         public static event OnClientConnectedEventHandler? OnClientConnected;
@@ -20,28 +19,30 @@ namespace Hubcon.SignalR
         public delegate void OnClientDisconnectedEventHandler(Type hubType, string connectionId);
 
         // Handlers
-        SignalrCommunicationHandler IHubconController<SignalrCommunicationHandler>.CommunicationHandler { get; set; }
-        public SignalrCommunicationHandler GetCommunicationHandler() => ((IHubconController<SignalrCommunicationHandler>)this).CommunicationHandler;
-        MethodHandler IHubconController<SignalrCommunicationHandler>.MethodHandler { get; set; }
-        public MethodHandler GetMethodHandler() => ((IHubconController<SignalrCommunicationHandler>)this).MethodHandler;
+        SignalRServerCommunicationHandler IHubconController<SignalRServerCommunicationHandler>.CommunicationHandler { get; set; }
+        public SignalRServerCommunicationHandler GetCommunicationHandler() => ((IHubconController<SignalRServerCommunicationHandler>)this).CommunicationHandler;
+        MethodHandler IHubconController<SignalRServerCommunicationHandler>.MethodHandler { get; set; }
+        public MethodHandler GetMethodHandler() => ((IHubconController<SignalRServerCommunicationHandler>)this).MethodHandler;
 
         // Clients
         protected static Dictionary<Type, Dictionary<string, ClientReference>> ClientReferences { get; } = new();
 
-        protected BaseSignalRHubController()
+        protected BaseHubController()
         {
-            var commHandlerRef = InstanceCreator.TryCreateInstance<SignalrCommunicationHandler>(this);
-            ((IHubconController<SignalrCommunicationHandler>)this).CommunicationHandler = commHandlerRef;
+            var commHandlerRef = new SignalRServerCommunicationHandler(this, GetType());
+            ((IHubconController<SignalRServerCommunicationHandler>)this).CommunicationHandler = commHandlerRef;
 
-            var methodHandlerRef = new MethodHandler(this, GetType());
-            ((IHubconController<SignalrCommunicationHandler>)this).MethodHandler = methodHandlerRef;
+            var methodHandlerRef = new MethodHandler();
+            ((IHubconController<SignalRServerCommunicationHandler>)this).MethodHandler = methodHandlerRef;
+
+            GetMethodHandler().BuildMethods(this, GetType());
         }
 
         public async Task<MethodResponse> HandleTask(MethodInvokeRequest info) => await GetMethodHandler().HandleWithResultAsync(info);
         public async Task HandleVoid(MethodInvokeRequest info) => await GetMethodHandler().HandleWithoutResultAsync(info);
 
-        protected IEnumerable<ClientReference> GetClients() => ClientReferences[GetType()].Values;
-        public static IEnumerable<ClientReference> GetClients(Type hubType) => ClientReferences[hubType].Values;
+        protected IEnumerable<IClientReference> GetClients() => ClientReferences[GetType()].Values;
+        public static IEnumerable<IClientReference> GetClients(Type hubType) => ClientReferences[hubType].Values;
 
         public override Task OnConnectedAsync()
         {
@@ -58,7 +59,7 @@ namespace Hubcon.SignalR
         }
     }
 
-    public abstract class BaseSignalRHubController<TICommunicationContract> : BaseSignalRHubController
+    public abstract class BaseSignalRHubController<TICommunicationContract> : BaseHubController
         where TICommunicationContract : ICommunicationContract
     {
         protected TICommunicationContract CurrentClient { get => ClientReferences[Context.ConnectionId].ClientController; }

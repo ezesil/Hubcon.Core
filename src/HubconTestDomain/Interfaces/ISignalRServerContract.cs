@@ -1,8 +1,8 @@
 ﻿using Hubcon.Interfaces.Communication;
 
-namespace Hubcon.SignalR.Interfaces
+namespace Hubcon.SignalR.Models.Interfaces
 {
-    public interface ISignalRContract : ICommunicationContract
+    public interface ISignalRServerContract : ICommunicationContract
     {
         public Task PrintMessage(string message);
         public void VoidPrintMessage(string message);

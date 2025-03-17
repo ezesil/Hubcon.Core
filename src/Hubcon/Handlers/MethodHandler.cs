@@ -1,8 +1,10 @@
 ﻿using Hubcon.Extensions;
+using Hubcon.Interfaces;
 using Hubcon.Interfaces.Communication;
 using Hubcon.Models;
 using System.Collections.Concurrent;
 using System.ComponentModel;
+using System.IO;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -13,8 +15,16 @@ namespace Hubcon.Handlers
     {
         internal ConcurrentDictionary<string, Delegate?> AvailableMethods = new();
 
-        public MethodHandler(object instance, Type type, Action<string, MethodInfo, Delegate>? forEachMethodAction = null)
+        public MethodHandler()
         {
+           
+        }
+
+        public void BuildMethods(object instance, Type type, Action<string, MethodInfo, MethodHandler>? forEachMethodAction = null)
+        {
+            if (!typeof(IHubconController).IsAssignableFrom(type))
+                throw new NotImplementedException($"El tipo {type.FullName} no implementa la interfaz {nameof(IHubconController)} o un tipo derivado.");
+
             if (AvailableMethods.IsEmpty)
             {
                 var interfaces = type.GetInterfaces().Where(x => typeof(ICommunicationContract).IsAssignableFrom(x));
@@ -44,7 +54,7 @@ namespace Hubcon.Handlers
 
                         AvailableMethods.TryAdd($"{methodSignature}", action);
 
-                        forEachMethodAction?.Invoke(methodSignature, method, action);
+                        forEachMethodAction?.Invoke(methodSignature, method, this);
                     }
                 }
             }

@@ -10,7 +10,7 @@ namespace Hubcon.Interfaces
 
     }
 
-    public interface IHubconController<TCommunicationHandler> : IHubconController where TCommunicationHandler : class, ICommunicationHandler
+    public interface IHubconController<TCommunicationHandler> : IHubconController where TCommunicationHandler : ICommunicationHandler
     {
         TCommunicationHandler CommunicationHandler { get; set; }
         MethodHandler MethodHandler { get; set; }
