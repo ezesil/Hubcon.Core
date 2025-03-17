@@ -37,18 +37,18 @@ namespace Hubcon.Core.Interceptors
             IHubContext<Hub>? hubContext = HubContextFactory?.Invoke();
 
 
-            //if (hub == null)
-            //{
-            //    result = await hubContext!.Clients
-            //        .Client(TargetClientId)
-            //        .InvokeMethodAsync<TResult?>(invocation.Method.GetMethodSignature(), new CancellationToken(), invocation.Arguments);
-            //}
-            //else
-            //{
-            //    result = await hub!.Clients
-            //        .Client(TargetClientId)
-            //        .InvokeMethodAsync<TResult?>(invocation.Method.GetMethodSignature(), new CancellationToken(), invocation.Arguments);
-            //}
+            if (hub == null)
+            {
+                result = await hubContext!.Clients
+                    .Client(TargetClientId)
+                    .InvokeMethodAsync<TResult?>(invocation.Method.GetMethodSignature(), new CancellationToken(), invocation.Arguments);
+            }
+            else
+            {
+                result = await hub!.Clients
+                    .Client(TargetClientId)
+                    .InvokeMethodAsync<TResult?>(invocation.Method.GetMethodSignature(), new CancellationToken(), invocation.Arguments);
+            }
 
             // Convertir el resultado y devolverlo
             invocation.ReturnValue = null!;

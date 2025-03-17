@@ -48,7 +48,7 @@ namespace Hubcon.Core.Connectors
             return (TIServerHubController)proxyGenerator.CreateInterfaceProxyWithTarget(
                 typeof(TIServerHubController),
                 (TIServerHubController)DynamicImplementationCreator.CreateImplementation(typeof(TIServerHubController)),
-                new ServerHubConnectorInterceptor(Connection)
+                new ServerConnectorInterceptor(Connection)
             );
         }
     }

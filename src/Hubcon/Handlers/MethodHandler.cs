@@ -50,7 +50,7 @@ namespace Hubcon.Handlers
             }
         }
 
-        public async Task HandleWithoutResultAsync(MethodInvokeInfo methodInfo)
+        public async Task HandleWithoutResultAsync(MethodInvokeRequest methodInfo)
         {
             AvailableMethods.TryGetValue(methodInfo.MethodName, out Delegate? del);
             object? result = del?.DynamicInvoke(methodInfo.GetDeserializedArgs(del));
@@ -59,7 +59,7 @@ namespace Hubcon.Handlers
                 await task;
         }
 
-        public async Task<MethodResponse> HandleSynchronousResult(MethodInvokeInfo methodInfo)
+        public async Task<MethodResponse> HandleSynchronousResult(MethodInvokeRequest methodInfo)
         {
             return await Task.Run(() =>
             {
@@ -73,7 +73,7 @@ namespace Hubcon.Handlers
             });
         }
 
-        public Task HandleSynchronous(MethodInvokeInfo methodInfo)
+        public Task HandleSynchronous(MethodInvokeRequest methodInfo)
         {
             AvailableMethods.TryGetValue(methodInfo.MethodName, out Delegate? del);
             del?.DynamicInvoke(methodInfo.GetDeserializedArgs(del));
@@ -81,7 +81,7 @@ namespace Hubcon.Handlers
             return Task.CompletedTask;
         }
 
-        public async Task<MethodResponse> HandleWithResultAsync(MethodInvokeInfo methodInfo)
+        public async Task<MethodResponse> HandleWithResultAsync(MethodInvokeRequest methodInfo)
         {
             AvailableMethods.TryGetValue(methodInfo.MethodName, out Delegate? del);
             object? result = del?.DynamicInvoke(methodInfo.GetDeserializedArgs(del));

@@ -9,12 +9,12 @@ namespace Hubcon.Interfaces.Communication
 {
     public interface ICommunicationHandler
     {
-        public Task CallAsync();
-        public Task<MethodResponse> InvokeAsync();
+        public Task<MethodResponse> InvokeAsync(string method, object[] arguments, CancellationToken cancellationToken);
+        public Task CallAsync(string method, object[] arguments, CancellationToken cancellationToken);
     }
 
     public interface IAsyncCommunicationHandler : ICommunicationHandler
     {
-        public Task<MethodInvokeInfo> ReceiveAsync();
+        public Task<MethodInvokeRequest> ReceiveAsync();
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Hubcon.Handlers;
 using Hubcon.Interfaces.Communication;
+using Hubcon.Models;
 using Hubcon.Tools;
 
 namespace Hubcon.Interfaces
@@ -12,11 +13,8 @@ namespace Hubcon.Interfaces
     public interface IHubconController<TCommunicationHandler> : IHubconController where TCommunicationHandler : class, ICommunicationHandler
     {
         TCommunicationHandler CommunicationHandler { get; set; }
-        TCommunicationHandler GetCommunicationHandler();
-
         MethodHandler MethodHandler { get; set; }
-        MethodHandler GetMethodHandler();
-
-        protected void Initialize();
+        Task<MethodResponse> HandleTask(MethodInvokeRequest info);
+        Task HandleVoid(MethodInvokeRequest info);
     }
 }

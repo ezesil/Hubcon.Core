@@ -6,7 +6,7 @@ using System.Threading;
 
 namespace Hubcon.Core.Interceptors
 {
-    internal class ServerHubConnectorInterceptor(ICommunicationsHandler handler) : AsyncInterceptorBase
+    internal class ServerConnectorInterceptor(ICommunicationsHandler handler) : AsyncInterceptorBase
     {
         protected override async Task<TResult> InterceptAsync<TResult>(IInvocation invocation, IInvocationProceedInfo proceedInfo, Func<IInvocation, IInvocationProceedInfo, Task<TResult>> proceed)
         {
