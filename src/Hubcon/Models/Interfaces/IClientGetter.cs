@@ -12,10 +12,9 @@ namespace Hubcon.Models.Interfaces
     }
 
 #pragma warning disable S2326 // Unused type parameters should be removed
-    public interface IClientAccessor<TICommunicationContract, TICommunicationHandler>
+    public interface IClientAccessor<TICommunicationContract, TIHubconController>
 #pragma warning restore S2326 // Unused type parameters should be removed
         where TICommunicationContract : ICommunicationContract?
-        where TICommunicationHandler : ICommunicationHandler
     {
         TICommunicationContract GetClient(string instanceId);
         List<string> GetAllClients();

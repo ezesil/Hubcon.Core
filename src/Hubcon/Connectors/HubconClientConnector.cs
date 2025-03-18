@@ -13,20 +13,20 @@ namespace Hubcon.Connectors
     /// </summary>
     /// <typeparam name="TICommunicationHandler"></typeparam>
     /// <typeparam name="TICommunicationContract"></typeparam>
-    public class HubconClientConnector<TICommunicationContract, TICommunicationHandler> : IClientManager<TICommunicationContract, TICommunicationHandler>
+    public class HubconClientConnector<TICommunicationContract, TIHubconController> : IClientManager<TICommunicationContract, TIHubconController>
         where TICommunicationContract : ICommunicationContract?
-        where TICommunicationHandler : ICommunicationHandler
+        where TIHubconController : class, IHubconController
     {
 #pragma warning disable S2743 // Static fields should not be used in generic types
-        private static readonly ProxyGenerator ProxyGen = new();
+        private readonly ProxyGenerator ProxyGen = new();
 #pragma warning restore S2743 // Static fields should not be used in generic types
 
-        protected Func<TICommunicationHandler> handlerFactory;
+        protected Func<ICommunicationHandler> handlerFactory;
         protected Dictionary<string, TICommunicationContract>? clients = new();
 
-        public HubconClientConnector(TICommunicationHandler handler)
+        public HubconClientConnector(TIHubconController handler)
         {
-            handlerFactory = () => handler;
+            handlerFactory = () => handler.CommunicationHandler;
         }
 
         protected TICommunicationContract BuildInstance(string instanceId)

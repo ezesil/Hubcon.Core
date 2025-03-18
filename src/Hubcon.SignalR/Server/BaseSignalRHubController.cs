@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace Hubcon.SignalR.Server
 {
-    public abstract class BaseHubController : Hub, IHubconController<SignalRServerCommunicationHandler>
+    public abstract class BaseHubController : Hub, IHubconController
     {
         // Events
         public static event OnClientConnectedEventHandler? OnClientConnected;
@@ -19,23 +19,23 @@ namespace Hubcon.SignalR.Server
         public delegate void OnClientDisconnectedEventHandler(Type hubType, string connectionId);
 
         // Handlers
-        SignalRServerCommunicationHandler IHubconController<SignalRServerCommunicationHandler>.CommunicationHandler { get; set; }
-        public SignalRServerCommunicationHandler GetCommunicationHandler() => ((IHubconController<SignalRServerCommunicationHandler>)this).CommunicationHandler;
-        MethodHandler IHubconController<SignalRServerCommunicationHandler>.MethodHandler { get; set; }
-        public MethodHandler GetMethodHandler() => ((IHubconController<SignalRServerCommunicationHandler>)this).MethodHandler;
+        public ICommunicationHandler GetCommunicationHandler() => CommunicationHandler;
+        public MethodHandler GetMethodHandler() => ((IHubconController)this).MethodHandler;
+
+        public MethodHandler MethodHandler { get; set; }
+        public ICommunicationHandler CommunicationHandler { get; set; }
 
         // Clients
         protected static Dictionary<Type, Dictionary<string, ClientReference>> ClientReferences { get; } = new();
 
         protected BaseHubController()
         {
-            var commHandlerRef = new SignalRServerCommunicationHandler(this, GetType());
-            ((IHubconController<SignalRServerCommunicationHandler>)this).CommunicationHandler = commHandlerRef;
+            ClientReferences.TryAdd(GetType(), new Dictionary<string, ClientReference>());
 
-            var methodHandlerRef = new MethodHandler();
-            ((IHubconController<SignalRServerCommunicationHandler>)this).MethodHandler = methodHandlerRef;
+            CommunicationHandler = new SignalRServerCommunicationHandler(this, GetType());
 
-            GetMethodHandler().BuildMethods(this, GetType());
+            MethodHandler = new MethodHandler();
+            MethodHandler.BuildMethods(this, GetType());
         }
 
         public async Task<MethodResponse> HandleTask(MethodInvokeRequest info) => await GetMethodHandler().HandleWithResultAsync(info);

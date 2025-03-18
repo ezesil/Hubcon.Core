@@ -13,8 +13,6 @@ namespace Hubcon.SignalR
         public static WebApplicationBuilder? UseHubconSignalR(this WebApplicationBuilder e)
         {
             e.Services.AddSignalR();
-            e.Services.AddScoped<SignalRClientCommunicationHandler>();
-            e.Services.AddScoped<SignalRServerCommunicationHandler>();
             return e;
         }
 

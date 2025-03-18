@@ -30,7 +30,7 @@ namespace Hubcon.HubControllers
 
             MethodInvokeRequest request = new MethodInvokeRequest(method, arguments).SerializeArgs();
 
-            return await client.InvokeAsync<MethodResponse>(nameof(IHubconController<ICommunicationHandler>.HandleTask), request, cancellationToken);
+            return await client.InvokeAsync<MethodResponse>(nameof(IHubconController.HandleTask), request, cancellationToken);
         }
 
         public async Task CallAsync(string method, object[] arguments, CancellationToken cancellationToken)
@@ -38,7 +38,7 @@ namespace Hubcon.HubControllers
             var client = _hubFactory.Invoke();
 
             MethodInvokeRequest request = new MethodInvokeRequest(method, arguments).SerializeArgs();
-            await client.SendAsync(nameof(IHubconController<ICommunicationHandler>.HandleVoid), request, cancellationToken);
+            await client.SendAsync(nameof(IHubconController.HandleVoid), request, cancellationToken);
         }
 
         public List<IClientReference> GetAllClients()
@@ -52,14 +52,14 @@ namespace Hubcon.HubControllers
         }
     }
 
-    public abstract class BaseSignalRClientController : IHubconController<SignalRClientCommunicationHandler>, IHostedService
+    public abstract class BaseSignalRClientController : IHubconController, IHostedService
     {
         protected string _url;
         protected Func<HubConnection> _hubFactory;
         protected CancellationToken _token;
         protected Task? runningTask;
 
-        public SignalRClientCommunicationHandler CommunicationHandler { get; set; }
+        public ICommunicationHandler CommunicationHandler { get; set; }
         public MethodHandler MethodHandler { get; set; }
 
         protected BaseSignalRClientController(string url)
@@ -99,7 +99,7 @@ namespace Hubcon.HubControllers
             where TICommunicationContract : ICommunicationContract
 
         {
-            return new HubconServerConnector<TICommunicationContract, SignalRClientCommunicationHandler>(CommunicationHandler).GetCurrentClient()!;
+            return new HubconServerConnector<TICommunicationContract, ICommunicationHandler>(CommunicationHandler).GetCurrentClient()!;
         }
 
         public BaseSignalRClientController StartInstanceAsync(Action<string>? consoleOutput = null, CancellationToken cancellationToken = default)

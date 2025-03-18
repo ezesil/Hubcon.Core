@@ -1,4 +1,5 @@
-﻿using Hubcon.Interfaces.Communication;
+﻿using Hubcon.Interfaces;
+using Hubcon.Interfaces.Communication;
 using Hubcon.Models.Interfaces;
 using Microsoft.AspNetCore.SignalR;
 
@@ -19,9 +20,9 @@ namespace Hubcon
     {
     }
 
-    public interface IClientManager<TICommunicationContract, TICommunicationHandler> : IClientAccessor<TICommunicationContract, TICommunicationHandler>
+    public interface IClientManager<TICommunicationContract, TIHubconController> : IClientAccessor<TICommunicationContract, TIHubconController>
         where TICommunicationContract : ICommunicationContract?
-        where TICommunicationHandler : ICommunicationHandler
+        where TIHubconController : IHubconController
     {
         void RemoveInstance(string instanceId);
     }
