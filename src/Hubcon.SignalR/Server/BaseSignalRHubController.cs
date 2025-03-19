@@ -1,4 +1,5 @@
-﻿using Hubcon.Handlers;
+﻿using Hubcon.Connectors;
+using Hubcon.Handlers;
 using Hubcon.Interfaces;
 using Hubcon.Interfaces.Communication;
 using Hubcon.Models;
@@ -6,6 +7,7 @@ using Hubcon.SignalR.Handlers;
 using Hubcon.SignalR.Models;
 using Hubcon.Tools;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.DependencyInjection;
 using System.Data;
 
 namespace Hubcon.SignalR.Server
@@ -20,9 +22,6 @@ namespace Hubcon.SignalR.Server
         public delegate void OnClientDisconnectedEventHandler(Type hubType, string connectionId);
 
         // Handlers
-        public ICommunicationHandler GetCommunicationHandler() => CommunicationHandler;
-        public MethodHandler GetMethodHandler() => ((IHubconController)this).MethodHandler;
-
         public MethodHandler MethodHandler { get; set; }
         public ICommunicationHandler CommunicationHandler { get; set; }
 
@@ -30,6 +29,11 @@ namespace Hubcon.SignalR.Server
         protected static Dictionary<Type, Dictionary<string, ClientReference>> ClientReferences { get; } = new();
 
         protected BaseHubController()
+        {
+            Build();
+        }
+
+        protected void Build()
         {
             ClientReferences.TryAdd(GetType(), new Dictionary<string, ClientReference>());
 
@@ -39,8 +43,8 @@ namespace Hubcon.SignalR.Server
             MethodHandler.BuildMethods(this, GetType());
         }
 
-        public async Task<MethodResponse> HandleTask(MethodInvokeRequest info) => await GetMethodHandler().HandleWithResultAsync(info);
-        public async Task HandleVoid(MethodInvokeRequest info) => await GetMethodHandler().HandleWithoutResultAsync(info);
+        public async Task<MethodResponse> HandleTask(MethodInvokeRequest info) => await MethodHandler.HandleWithResultAsync(info);
+        public async Task HandleVoid(MethodInvokeRequest info) => await MethodHandler.HandleWithoutResultAsync(info);
 
         protected IEnumerable<IClientReference> GetClients() => ClientReferences[GetType()].Values;
         public static IEnumerable<IClientReference> GetClients(Type hubType) => ClientReferences[hubType].Values;
@@ -60,14 +64,32 @@ namespace Hubcon.SignalR.Server
         }
     }
 
-    public abstract class BaseSignalRHubController<TICommunicationContract> : BaseHubController
+    public abstract class BaseHubController<TICommunicationContract> : BaseHubController
         where TICommunicationContract : ICommunicationContract
     {
-        protected TICommunicationContract CurrentClient { get => ClientReferences[Context.ConnectionId].ClientController; }
-        protected new Dictionary<string, ClientReference<TICommunicationContract>> ClientReferences { get; } = new();
-        protected new IEnumerable<ClientReference<TICommunicationContract>> GetClients() => ClientReferences.Values;
 
-        protected BaseSignalRHubController()
+        private IClientManager _clientManager;
+        protected IClientManager clientManager 
+        { 
+            get
+            {
+                if (_clientManager == null)
+                {
+                    Type clientManagerType = typeof(IClientManager<,>).MakeGenericType(typeof(TICommunicationContract), GetType());
+                    using (var scope = StaticServiceProvider.Services.CreateScope())
+                    {
+                        var scopedProvider = scope.ServiceProvider;
+                        _clientManager = (IClientManager)scopedProvider.GetRequiredService(clientManagerType);
+                    }
+                }
+
+                return _clientManager;
+            } 
+        }
+        protected TICommunicationContract? CurrentClient { get => clientManager.GetClient<TICommunicationContract>(Context.ConnectionId); }
+        protected TICommunicationContract? GetClient(string connectionId) => clientManager.GetClient<TICommunicationContract>(connectionId);
+
+        protected BaseHubController()
         {
         }
     }

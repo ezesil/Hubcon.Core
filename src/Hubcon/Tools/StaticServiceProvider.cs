@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Hubcon.Tools
 {
@@ -33,6 +34,7 @@ namespace Hubcon.Tools
                 {
                     throw new InvalidOperationException($"Use {nameof(DependencyInjection.UseHubcon)}() method after App.Build().");
                 }
+
                 return App.Services;
             }
         }

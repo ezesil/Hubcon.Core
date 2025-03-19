@@ -5,25 +5,19 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace Hubcon
 {
-    public interface IClientManager : IClientAccessor
+    public interface IClientManager
     {
-        TICommunicationContract CreateInstance<THub, TICommunicationContract>(string instanceId)
-            where THub : ServerHub
-            where TICommunicationContract : ICommunicationContract?;
-        TICommunicationContract CreateInstance<TICommunicationContract>(Type hubType, string instanceId)
-            where TICommunicationContract : ICommunicationContract?;
-
-        void RemoveInstance(Type hubType, string instanceId);
+        TICommunicationContract GetClient<TICommunicationContract>(string instanceId) where TICommunicationContract : ICommunicationContract;
+        List<string> GetAllClients();
+        void RemoveClient(string instanceId);
     }
 
-    public class ServerHub
-    {
-    }
-
-    public interface IClientManager<TICommunicationContract, TIHubconController> : IClientAccessor<TICommunicationContract, TIHubconController>
+#pragma warning disable S2326 // Unused type parameters should be removed
+    public interface IClientManager<out TICommunicationContract, TIHubconController> : IClientManager
+#pragma warning restore S2326 // Unused type parameters should be removed
         where TICommunicationContract : ICommunicationContract?
         where TIHubconController : IHubconController
     {
-        void RemoveInstance(string instanceId);
+        TICommunicationContract GetOrCreateClient(string instanceId);
     }
 }

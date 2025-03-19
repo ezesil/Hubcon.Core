@@ -48,22 +48,21 @@ namespace HubconTest
             app.MapHub<TestSignalRController>("/clienthub");
 
             //Just a test endpoint, it can also be injected in a controller.
-            app.MapGet("/test", async (IClientAccessor<ITestClientController, TestSignalRController> clientAccessor) =>
+            app.MapGet("/test", async (IClientManager<ITestClientController, TestSignalRController> clientAccessor) =>
             {
-                var clientId = clientAccessor.GetAllClients().FirstOrDefault()!;
                 // Getting some connected clientId
+                var clientId = clientAccessor.GetAllClients().FirstOrDefault()!;
 
                 // Gets a client instance
-                var instance = clientAccessor.GetClient(clientId);
+                var client = clientAccessor.GetOrCreateClient(clientId);
 
-                // Using some methods
-                string message = "Mensaje de prueba";
-                Console.WriteLine($"Servidor: Mensaje enviado a cliente de Hubcon SignalR: {message}");
-                var item = await instance.ShowAndReturnMessage(message);
-                Console.WriteLine($"Servidor: Mensaje recibido desde el cliente de Hubcon SignalR: {message}");
+                await client.Random();
 
-
-                return item;
+                //// Using some methods
+                //string message = "Mensaje de prueba";
+                //Console.WriteLine($"Servidor: Mensaje enviado a cliente de Hubcon SignalR: {message}");
+                //var item = await instance.ShowAndReturnMessage(message);
+                //Console.WriteLine($"Servidor: Mensaje recibido desde el cliente de Hubcon SignalR: {message}");
             });
 
             app.Run();

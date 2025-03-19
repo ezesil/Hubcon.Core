@@ -15,6 +15,8 @@ namespace Hubcon
 
         protected override async Task<TResult> InterceptAsync<TResult>(IInvocation invocation, IInvocationProceedInfo proceedInfo, Func<IInvocation, IInvocationProceedInfo, Task<TResult>> proceed)
         {
+            Console.WriteLine($"[Server][MethodInterceptor] Calling {invocation.Method.Name} on CLIENT. Args: [{string.Join(",", invocation.Arguments.Select(x => $"{x}"))}]");
+
             MethodResponse response = await HandlerFactory
                 .Invoke()
                 .InvokeAsync(
@@ -31,6 +33,8 @@ namespace Hubcon
 
         protected override async Task InterceptAsync(IInvocation invocation, IInvocationProceedInfo proceedInfo, Func<IInvocation, IInvocationProceedInfo, Task> proceed)
         {
+            Console.WriteLine($"[Server][MethodInterceptor] Calling {invocation.Method.Name} on CLIENT. Args: [{string.Join(",", invocation.Arguments.Select(x => $"{x}"))}]");
+
             await HandlerFactory
                 .Invoke()
                 .CallAsync(

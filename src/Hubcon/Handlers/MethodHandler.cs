@@ -1,4 +1,5 @@
-﻿using Hubcon.Extensions;
+﻿using Castle.DynamicProxy;
+using Hubcon.Extensions;
 using Hubcon.Interfaces;
 using Hubcon.Interfaces.Communication;
 using Hubcon.Models;
@@ -62,6 +63,8 @@ namespace Hubcon.Handlers
 
         public async Task HandleWithoutResultAsync(MethodInvokeRequest methodInfo)
         {
+            Console.WriteLine($"[MethodHandler] Received call {methodInfo.MethodName}. Args: [{string.Join(",", methodInfo.Args.Select(x => $"{x}"))}]");
+
             AvailableMethods.TryGetValue(methodInfo.MethodName, out Delegate? del);
             object? result = del?.DynamicInvoke(methodInfo.GetDeserializedArgs(del));
 
@@ -71,6 +74,8 @@ namespace Hubcon.Handlers
 
         public async Task<MethodResponse> HandleSynchronousResult(MethodInvokeRequest methodInfo)
         {
+            Console.WriteLine($"[MethodHandler] Received call {methodInfo.MethodName}. Args: [{string.Join(",", methodInfo.Args.Select(x => $"{x}"))}]");
+
             return await Task.Run(() =>
             {
                 AvailableMethods.TryGetValue(methodInfo.MethodName, out Delegate? del);
@@ -85,6 +90,8 @@ namespace Hubcon.Handlers
 
         public Task HandleSynchronous(MethodInvokeRequest methodInfo)
         {
+            Console.WriteLine($"[MethodHandler] Received call {methodInfo.MethodName}. Args: [{string.Join(",", methodInfo.Args.Select(x => $"{x}"))}]");
+
             AvailableMethods.TryGetValue(methodInfo.MethodName, out Delegate? del);
             del?.DynamicInvoke(methodInfo.GetDeserializedArgs(del));
 
@@ -93,6 +100,8 @@ namespace Hubcon.Handlers
 
         public async Task<MethodResponse> HandleWithResultAsync(MethodInvokeRequest methodInfo)
         {
+            Console.WriteLine($"[MethodHandler] Received call {methodInfo.MethodName}. Args: [{string.Join(",", methodInfo.Args.Select(x => $"{x}"))}]");
+
             AvailableMethods.TryGetValue(methodInfo.MethodName, out Delegate? del);
             object? result = del?.DynamicInvoke(methodInfo.GetDeserializedArgs(del));
 

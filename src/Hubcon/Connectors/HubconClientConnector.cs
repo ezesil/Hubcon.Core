@@ -17,10 +17,6 @@ namespace Hubcon.Connectors
         where TICommunicationContract : ICommunicationContract?
         where TIHubconController : class, IHubconController
     {
-#pragma warning disable S2743 // Static fields should not be used in generic types
-        private readonly ProxyGenerator ProxyGen = new();
-#pragma warning restore S2743 // Static fields should not be used in generic types
-
         protected Func<ICommunicationHandler> handlerFactory;
         protected Dictionary<string, TICommunicationContract>? clients = new();
 
@@ -31,17 +27,21 @@ namespace Hubcon.Connectors
 
         protected TICommunicationContract BuildInstance(string instanceId)
         {
-            var interceptor = handlerFactory.Invoke();
-            interceptor.WithUserId(instanceId);
+            var communicationHandler = handlerFactory.Invoke();
+            communicationHandler.WithUserId(instanceId);
+
+            var interceptor = new ClientControllerConnectorInterceptor(communicationHandler);
+
+            ProxyGenerator ProxyGen = new();
 
             return (TICommunicationContract)ProxyGen.CreateInterfaceProxyWithTarget(
                 typeof(TICommunicationContract),
                 (TICommunicationContract)DynamicImplementationCreator.CreateImplementation(typeof(TICommunicationContract)),
-                new ClientControllerConnectorInterceptor(handlerFactory.Invoke())
+                interceptor
             );
         }
 
-        public TICommunicationContract GetClient(string instanceId)
+        public TICommunicationContract GetOrCreateClient(string instanceId)
         {
             if (clients!.TryGetValue(instanceId, out TICommunicationContract? value))
                 return value;
@@ -51,11 +51,6 @@ namespace Hubcon.Connectors
             return client;
         }
 
-        public void RemoveInstance(string instanceId)
-        {
-            clients?.Remove(instanceId, out _);
-        }
-
         public List<string> GetAllClients()
         {
             return handlerFactory
@@ -63,6 +58,16 @@ namespace Hubcon.Connectors
                 .GetAllClients()
                 .Select(x => x.Id)
                 .ToList();
+        }
+
+        public void RemoveClient(string instanceId)
+        {
+            clients?.Remove(instanceId, out _);
+        }
+
+        public TCommunicationContract GetClient<TCommunicationContract>(string instanceId) where TCommunicationContract : ICommunicationContract
+        {
+            return (TCommunicationContract)(ICommunicationContract)GetOrCreateClient(instanceId)!;
         }
     }
 }

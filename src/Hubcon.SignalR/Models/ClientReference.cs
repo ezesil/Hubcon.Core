@@ -17,7 +17,12 @@ namespace Hubcon.SignalR.Models
         {
             Id = id;
             ClientInfo = clientInfo;
-        }   
+        }
+
+        public IClientReference<TICommunicationContract> WithController<TICommunicationContract>(TICommunicationContract clientController) where TICommunicationContract : ICommunicationContract
+        {
+            return new ClientReference<TICommunicationContract>(this, clientController);
+        }
     }
     public class ClientReference<TICommunicationContract> : ClientReference, IClientReference<TICommunicationContract> 
         where TICommunicationContract : ICommunicationContract
@@ -33,6 +38,10 @@ namespace Hubcon.SignalR.Models
         {
             ClientController = clientController;
         }
-    }
 
+        public ClientReference(ClientReference clientReference, TICommunicationContract clientController) : base(clientReference.Id, clientReference.ClientInfo)
+        {
+            ClientController = clientController;
+        }
+    }
 }

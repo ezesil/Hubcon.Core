@@ -11,10 +11,11 @@ namespace HubconTestClient
         static async Task Main()
         {
 
-            var hub = await new TestHubController(Url).StartInstanceAsync(Console.WriteLine);
-            var connector = hub.GetConnector<ISignalRServerContract>();
+            await new TestHubController(Url).StartAsync(Console.WriteLine);
+            //var connector = hub.sERVER;
 
-            await connector.PrintMessage("Mensaje de prueba desde el cliente.");
+            //var message = "PING";
+            //await connector.PrintMessage(message);
 
             Console.ReadKey();
         }

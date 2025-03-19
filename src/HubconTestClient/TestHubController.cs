@@ -12,8 +12,6 @@ namespace HubconTestClient
         {
             var temperatura = await Server.GetTemperatureFromServer();
             Console.WriteLine($"Temperatura desde el conector: {temperatura}");
-
-            await Server.ShowTextOnServer();
         }
 
         public async Task<string> ShowAndReturnMessage(string message)

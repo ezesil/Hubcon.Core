@@ -23,7 +23,7 @@ namespace Hubcon
         /// <returns></returns>
         public static IServiceCollection AddHubconClientAccessor(this IServiceCollection services)
         {
-            services.AddScoped(typeof(IClientAccessor<,>), typeof(HubconClientConnector<,>));
+            services.AddScoped(typeof(IClientManager<,>), typeof(HubconClientConnector<,>));
             return services;
         }
 

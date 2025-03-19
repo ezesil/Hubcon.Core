@@ -17,6 +17,8 @@ namespace Hubcon.Interceptors
 
         protected override async Task<TResult> InterceptAsync<TResult>(IInvocation invocation, IInvocationProceedInfo proceedInfo, Func<IInvocation, IInvocationProceedInfo, Task<TResult>> proceed)
         {
+            Console.WriteLine($"[Client][MethodInterceptor] Calling {invocation.Method.Name} on SERVER. Args: [{string.Join(",", invocation.Arguments.Select(x => $"{x}"))}]");
+
             MethodResponse? result = await handler.InvokeAsync(
                 invocation.Method.GetMethodSignature(),
                 invocation.Arguments,
@@ -30,6 +32,8 @@ namespace Hubcon.Interceptors
 
         protected override async Task InterceptAsync(IInvocation invocation, IInvocationProceedInfo proceedInfo, Func<IInvocation, IInvocationProceedInfo, Task> proceed)
         {
+            Console.WriteLine($"[Client][MethodInterceptor] Calling {invocation.Method.Name} on SERVER. Args: [{string.Join(",", invocation.Arguments.Select(x => $"{x}"))}]");
+
             await handler.CallAsync(
                 invocation.Method.GetMethodSignature(),
                 invocation.Arguments,
