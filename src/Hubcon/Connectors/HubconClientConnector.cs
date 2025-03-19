@@ -32,6 +32,7 @@ namespace Hubcon.Connectors
         protected TICommunicationContract BuildInstance(string instanceId)
         {
             var interceptor = handlerFactory.Invoke();
+            interceptor.WithUserId(instanceId);
 
             return (TICommunicationContract)ProxyGen.CreateInterfaceProxyWithTarget(
                 typeof(TICommunicationContract),

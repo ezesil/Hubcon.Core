@@ -12,12 +12,15 @@ namespace HubconTestClient
         {
             var temperatura = await Server.GetTemperatureFromServer();
             Console.WriteLine($"Temperatura desde el conector: {temperatura}");
+
+            await Server.ShowTextOnServer();
         }
 
         public async Task<string> ShowAndReturnMessage(string message)
         {
-            Console.WriteLine(message);
-            return message;
+            string returnMessage = "Hola desde el controller del cliente.";
+            Console.WriteLine($"Cliente: Metodo {nameof(ShowAndReturnMessage)} llamado. Mensaje recibido: {message}. Respondiendo con '{returnMessage}'");
+            return returnMessage;
         }
 
         public string ShowAndReturnType(string message)

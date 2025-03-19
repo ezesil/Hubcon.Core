@@ -5,18 +5,17 @@ namespace HubconTestClient
     internal class Program
     {
         #pragma warning disable S1075 // URIs should not be hardcoded
-        private const string Url = "http://localhost:5237/clienthub";
+        private const string Url = "http://localhost:5056/clienthub";
         #pragma warning restore S1075 // URIs should not be hardcoded
 
         static async Task Main()
         {
 
-            var connector = new TestHubController(Url).GetConnector<ISignalRServerContract>();
+            var hub = await new TestHubController(Url).StartInstanceAsync(Console.WriteLine);
+            var connector = hub.GetConnector<ISignalRServerContract>();
 
-            await connector.PrintMessage("a1");
-            var serverData = await connector.PrintMessageWithReturn("a2");
+            await connector.PrintMessage("Mensaje de prueba desde el cliente.");
 
-            Console.WriteLine(serverData);
             Console.ReadKey();
         }
     }

@@ -6,6 +6,7 @@ using Hubcon.SignalR.Handlers;
 using Hubcon.SignalR.Models;
 using Hubcon.Tools;
 using Microsoft.AspNetCore.SignalR;
+using System.Data;
 
 namespace Hubcon.SignalR.Server
 {
@@ -32,7 +33,7 @@ namespace Hubcon.SignalR.Server
         {
             ClientReferences.TryAdd(GetType(), new Dictionary<string, ClientReference>());
 
-            CommunicationHandler = new SignalRServerCommunicationHandler(this, GetType());
+            CommunicationHandler = new SignalRServerCommunicationHandler(GetType());
 
             MethodHandler = new MethodHandler();
             MethodHandler.BuildMethods(this, GetType());

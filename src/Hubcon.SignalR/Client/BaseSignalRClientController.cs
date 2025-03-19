@@ -58,6 +58,7 @@ namespace Hubcon.HubControllers
         protected Func<HubConnection> _hubFactory;
         protected CancellationToken _token;
         protected Task? runningTask;
+        protected HubConnection hub;
 
         public ICommunicationHandler CommunicationHandler { get; set; }
         public MethodHandler MethodHandler { get; set; }
@@ -99,18 +100,27 @@ namespace Hubcon.HubControllers
             where TICommunicationContract : ICommunicationContract
 
         {
-            return new HubconServerConnector<TICommunicationContract, ICommunicationHandler>(CommunicationHandler).GetCurrentClient()!;
+            return new HubconServerConnector<TICommunicationContract, ICommunicationHandler>(CommunicationHandler).GetClient()!;
         }
 
-        public BaseSignalRClientController StartInstanceAsync(Action<string>? consoleOutput = null, CancellationToken cancellationToken = default)
+        public async Task<BaseSignalRClientController> StartInstanceAsync(Action<string>? consoleOutput = null, CancellationToken cancellationToken = default)
         {
             _ = StartAsync(consoleOutput, cancellationToken);
-            return this;
+
+            while (true) 
+            { 
+                if(hub.State == HubConnectionState.Connected)
+                {
+                    return this;
+                }
+
+                await Task.Delay(500, cancellationToken);
+            }          
         }
 
         public async Task StartAsync(Action<string>? consoleOutput = null, CancellationToken cancellationToken = default)
         {
-            var hub = _hubFactory.Invoke();
+            hub = _hubFactory.Invoke();
             try
             {
                 _token = cancellationToken;
@@ -118,7 +128,7 @@ namespace Hubcon.HubControllers
                 bool connectedInvoked = false;
                 while (true)
                 {
-                    await Task.Delay(1000, cancellationToken);
+                    await Task.Delay(3000, cancellationToken);
                     if (hub.State == HubConnectionState.Connecting)
                     {
                         consoleOutput?.Invoke($"Connecting to {_url}...");
@@ -127,7 +137,7 @@ namespace Hubcon.HubControllers
                     }
                     else if (hub.State == HubConnectionState.Disconnected)
                     {
-                        consoleOutput?.Invoke($"Failed connectin to {_url}. Retrying...");
+                        consoleOutput?.Invoke($"Failed connecting to {_url}. Retrying...");
                         _ = hub.StartAsync(_token);
                         connectedInvoked = false;
                     }

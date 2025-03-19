@@ -3,20 +3,24 @@ using Hubcon.Interfaces.Communication;
 using Hubcon.Models;
 using Hubcon.SignalR.Server;
 using Microsoft.AspNetCore.SignalR;
+using Hubcon.Tools;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Hubcon.SignalR.Handlers
 {
     public class SignalRServerCommunicationHandler : ICommunicationHandler
     {
         private protected string TargetClientId { get; private set; } = string.Empty;
-        private protected Func<IHubContext<BaseHubController>>? HubContextFactory { get; private set; }
+        private protected Func<IHubContext<Hub>>? HubContextFactory { get; private set; }
         private protected Func<BaseHubController>? HubFactory { get; private set; }
         private protected Type HubType { get; private set; }
 
-        public SignalRServerCommunicationHandler(IHubContext<BaseHubController> hubContextFactory, Type hubType)
+        public SignalRServerCommunicationHandler(Type hubType)
         {
             HubType = hubType;
-            HubContextFactory = () => hubContextFactory;
+            Type hubContextType = typeof(IHubContext<>).MakeGenericType(hubType);
+            var hubContext = (IHubContext<Hub>)StaticServiceProvider.Services.GetRequiredService(hubContextType);
+            HubContextFactory = () => hubContext;
         }
 
         public SignalRServerCommunicationHandler(BaseHubController hubFactory, Type hubType)

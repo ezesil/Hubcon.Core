@@ -5,9 +5,9 @@ namespace HubconTest.Controllers
 {
     public class TestSignalRController : BaseHubController, ISignalRServerContract
     {
-        public Task PrintMessage(string message)
+        public async Task PrintMessage(string message)
         {
-            throw new NotImplementedException();
+            Console.WriteLine(message);
         }
 
         public Task<string> PrintMessageWithReturn(string message)

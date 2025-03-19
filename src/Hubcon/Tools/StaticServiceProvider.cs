@@ -2,7 +2,7 @@
 
 namespace Hubcon.Tools
 {
-    internal static class StaticServiceProvider
+    public static class StaticServiceProvider
     {
         // Propiedad estática que accede al WebApplication configurado
         internal static WebApplication App
@@ -25,7 +25,7 @@ namespace Hubcon.Tools
         internal static void Setup(WebApplication app) => _app = app;
 
         // Accede a los servicios del contenedor
-        internal static IServiceProvider Services
+        public static IServiceProvider Services
         {
             get
             {

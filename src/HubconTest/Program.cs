@@ -8,6 +8,7 @@ using HubconTest.Controllers;
 using Scalar.AspNetCore;
 using Hubcon.SignalR;
 using Hubcon.Models.Interfaces;
+using HubconTestDomain;
 
 
 namespace HubconTest
@@ -31,7 +32,7 @@ namespace HubconTest
 
             var app = builder.Build();
 
-            //app.UseHubcon();
+            app.UseHubcon();
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
@@ -47,7 +48,7 @@ namespace HubconTest
             app.MapHub<TestSignalRController>("/clienthub");
 
             //Just a test endpoint, it can also be injected in a controller.
-            app.MapGet("/test", async (IClientAccessor<ISignalRServerContract, TestSignalRController> clientAccessor) =>
+            app.MapGet("/test", async (IClientAccessor<ITestClientController, TestSignalRController> clientAccessor) =>
             {
                 var clientId = clientAccessor.GetAllClients().FirstOrDefault()!;
                 // Getting some connected clientId
@@ -56,10 +57,13 @@ namespace HubconTest
                 var instance = clientAccessor.GetClient(clientId);
 
                 // Using some methods
-                await instance.PrintMessage("a1");
-                var temperature = await instance.PrintMessageWithReturn("a2");
+                string message = "Mensaje de prueba";
+                Console.WriteLine($"Servidor: Mensaje enviado a cliente de Hubcon SignalR: {message}");
+                var item = await instance.ShowAndReturnMessage(message);
+                Console.WriteLine($"Servidor: Mensaje recibido desde el cliente de Hubcon SignalR: {message}");
 
-                return temperature;
+
+                return item;
             });
 
             app.Run();

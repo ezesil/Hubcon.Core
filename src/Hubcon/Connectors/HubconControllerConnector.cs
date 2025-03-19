@@ -30,7 +30,7 @@ namespace Hubcon.Connectors
                 if (!TType.IsInterface)
                     throw new ArgumentException($"El tipo {typeof(TICommunicationContract).FullName} no es una interfaz.");
 
-                if (!typeof(IHubconController).IsAssignableFrom(TType))
+                if (!typeof(ICommunicationContract).IsAssignableFrom(TType))
                     throw new NotImplementedException($"El tipo {TType.FullName} no implementa la interfaz {nameof(ICommunicationContract)} ni es un tipo derivado.");
 
                 foreach (var method in TType.GetMethods())

@@ -1,8 +1,5 @@
-﻿using Hubcon.Connectors;
-using Hubcon.HubControllers;
-using Hubcon.Interfaces;
-using Hubcon.Interfaces.Communication;
-using Hubcon.SignalR.Handlers;
+﻿using MessagePack;
+using MessagePack.Resolvers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -12,7 +9,14 @@ namespace Hubcon.SignalR
     {
         public static WebApplicationBuilder? UseHubconSignalR(this WebApplicationBuilder e)
         {
-            e.Services.AddSignalR();
+            MessagePackSerializerOptions mpOptions = MessagePackSerializerOptions.Standard
+                .WithResolver(CompositeResolver.Create(
+                    ContractlessStandardResolver.Instance // Usa un resolver sin atributos
+                ));
+
+            e.Services.AddSignalR().AddMessagePackProtocol(options => {
+                options.SerializerOptions = mpOptions;
+            });
             return e;
         }
 
